@@ -9,7 +9,7 @@ public class MoveController : MonoBehaviour
     private Vector2 moveInput;
     private bool isGrounded = true; // 바닥에 있는지 체크
 
-
+    public Animator animator;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
