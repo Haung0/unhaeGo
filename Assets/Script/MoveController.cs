@@ -2,16 +2,30 @@ using UnityEngine;
 
 public class MoveController : MonoBehaviour
 {
-    public float moveSpeed = 5f;    // 좌우 이동 속도
-    public float jumpForce = 7f;    // 점프 힘
-    public float runSpeed = 9f;     // Shift 키 누를 때 이동 속도
+    [Header("이동 설정")]
+    public float moveSpeed = 5f;
+    public float jumpForce = 7f;
+    public float runSpeed = 9f;
 
+    [Header("근접 공격 설정")]
+    public int meleeDamage = 10;
+    public float meleeRange = 1f;
+    public LayerMask enemyLayer;
+    public Transform attackPoint;
+
+    [Header("총알 공격 설정")]
+    public GameObject bulletPrefab;
+    public Transform bulletSpawnPoint;
+    public int maxBullets = 6;
+    public float shootCooldown = 2f;
+    private int bulletsLeft;
+    private float nextShootTime = 0f;
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
-    private bool isGrounded = true; // 바닥에 있는지 체크
+    private bool isGrounded = true;
 
-    SpriteRenderer spriteRenderer;
+    private SpriteRenderer spriteRenderer;
     private Animator Anim;
 
     private void Awake()
@@ -19,59 +33,106 @@ public class MoveController : MonoBehaviour
         Anim = GetComponent<Animator>();
     }
 
-
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        bulletsLeft = maxBullets;
     }
 
     void Update()
     {
-        // 좌우 이동 입력
+        // 좌우 이동
         float moveX = Input.GetAxisRaw("Horizontal");
         moveInput = new Vector2(moveX, 0).normalized;
+        Anim.SetBool("isWalking", moveX != 0);
 
-        // ↑키를 눌렀고, 바닥에 있을 때만 점프 가능
+        // 점프
         if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded)
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-            isGrounded = false; // 점프 후 공중에 있으므로 false로 설정해서 막음
+            isGrounded = false;
         }
 
-        //spriteRenderer.flipX = Input.GetAxisRaw("Horizontal") == -1;
+        // 스프라이트 Flip
+        if (moveInput.x > 0) spriteRenderer.flipX = false;
+        else if (moveInput.x < 0) spriteRenderer.flipX = true;
 
-        if (moveInput.x > 0)        // 오른쪽 이동
+        // 근접 공격 (좌클릭)
+        if (Input.GetMouseButtonDown(0))
         {
-            spriteRenderer.flipX = false;
-        }
-        else if (moveInput.x < 0)   // 왼쪽 이동
-        {
-            spriteRenderer.flipX = true;
+            MeleeAttack();
         }
 
+        // 총알 발사 (우클릭)
+        if (Input.GetMouseButtonDown(1) && Time.time >= nextShootTime)
+        {
+            Shoot();
+        }
     }
 
     void FixedUpdate()
     {
-        // 좌우 이동
-        //rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
-
-        rb.velocity = new Vector2(moveInput.x * moveSpeed, rb.velocity.y);
-
         float currentSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : moveSpeed;
         rb.velocity = new Vector2(moveInput.x * currentSpeed, rb.velocity.y);
-
     }
 
-    // 바닥 충돌 체크 (플랫폼이나 땅에 닿으면 isGrounded = true)
     void OnCollisionEnter2D(Collision2D collision)
     {
-        // Tag가 "Ground"인 오브젝트와 충돌한 경우에만 바닥으로 간주
         if (collision.collider.CompareTag("Ground"))
         {
             isGrounded = true;
         }
     }
-}
 
+    // 근접 공격
+    void MeleeAttack()
+    {
+        //Anim.SetTrigger("isAttacking");
+
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, meleeRange, enemyLayer);
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            BaseController bc = enemy.GetComponent<BaseController>();
+            if (bc != null)
+            {
+                bc.TakeDamage(meleeDamage);
+                Debug.Log("근접 공격! 데미지: " + meleeDamage);
+            }
+        }
+    }
+
+    // 총알 발사
+    void Shoot()
+    {
+        if (bulletsLeft <= 0)
+        {
+            // 재장전
+            nextShootTime = Time.time + shootCooldown;
+            bulletsLeft = maxBullets;
+            Debug.Log("재장전 완료!");
+            return;
+        }
+
+        Vector3 direction = spriteRenderer.flipX ? Vector3.left : Vector3.right;
+        GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
+        bullet.GetComponent<Rigidbody2D>().velocity = direction * 10f;
+
+        // 총알 데미지 전달
+        Bullet bulletScript = bullet.GetComponent<Bullet>();
+        if (bulletScript != null)
+        {
+            bulletScript.damage = meleeDamage; // 총알 데미지 = 근접 데미지와 동일 (원하면 따로 값 줄 수 있음)
+        }
+
+        bulletsLeft--;
+        nextShootTime = Time.time + 0.2f;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        if (attackPoint == null) return;
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPoint.position, meleeRange);
+    }
+}

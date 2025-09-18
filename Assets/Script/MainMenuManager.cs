@@ -9,6 +9,10 @@ public class MainMenuManager : MonoBehaviour
         SceneManager.LoadScene("GameScene");  // 이동할 씬 이름
     }
 
+
+
+
+
     // 게임 방법 버튼
     public void HowToPlay()
     {

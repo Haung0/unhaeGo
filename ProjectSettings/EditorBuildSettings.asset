@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/HowtoPlayScene2.unity
     guid: 12846370bd86f0445b940a31300793b5
+  - enabled: 1
+    path: Assets/Scenes/NextStage.unity
+    guid: d3de1f5f12c5323448698f0c05cb8c9e
   m_configObjects: {}
