@@ -11,9 +11,7 @@ public class EnemyMelee : MonoBehaviour
     public int damage = 5;            // 공격력
     public float attackRate = 1f;     // 초당 공격 횟수
 
-    //[Header("체력 설정")]
-    //public float MaxHp = 20f;
-    //private float CurHp;
+    
     private bool isDead = false;
 
     private Rigidbody2D rb;
@@ -69,27 +67,4 @@ public class EnemyMelee : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
             isGrounded = true;
     }
-
-    // -----------------------------
-    // 체력 관련 함수 추가
-    // -----------------------------
-    //public void TakeDamage(int amount)
-    //{
-    //    if (isDead) return;
-
-    //    CurHp -= amount;
-
-    //    if (CurHp <= 0)
-    //        Die();
-    //}
-
-    //void Die()
-    //{
-    //    isDead = true;
-    //    CurHp = 0;
-    //    rb.simulated = false;
-
-    //    // 2초 후 오브젝트 제거
-    //    Destroy(gameObject, 2f);
-    //}
 }

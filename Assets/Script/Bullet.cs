@@ -2,58 +2,32 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public int damage = 5;
-    public float lifeTime = 3f;
-    public float speed = 10f;
-    public float rotateSpeed = 200f; // 회전 속도 (유도 정도)
-
-    private Rigidbody2D rb;
-    private Transform target;
-
-    // 총알 타입: 플레이어용인지 적용인지
     public enum BulletType { Player, Enemy }
     public BulletType bulletType = BulletType.Player;
+
+    public int damage = 5;
+    public float speed = 10f;
+    public float lifeTime = 3f;
+
+    private Rigidbody2D rb;
+    private Vector2 moveDirection; // 플레이어나 EnemyRanged에서 지정하는 방향
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        Destroy(gameObject, lifeTime);
+    }
 
-        // 목표 설정
-        switch (bulletType)
-        {
-            case BulletType.Player:
-                GameObject enemy = GameObject.FindWithTag("Enemy");
-                if (enemy != null) target = enemy.transform;
-                break;
-            case BulletType.Enemy:
-                GameObject player = GameObject.FindWithTag("Player");
-                if (player != null) target = player.transform;
-                break;
-        }
-
-        Destroy(gameObject, lifeTime); // 수명 종료 시 삭제
+    // 방향을 외부에서 설정
+    public void SetDirection(Vector2 dir)
+    {
+        moveDirection = dir.normalized;
     }
 
     void FixedUpdate()
     {
-        if (target == null)
-        {
-            rb.velocity = transform.right * speed; // 목표 없으면 직선
-            return;
-        }
-
-        // 방향 계산
-        Vector2 direction = (Vector2)(target.position - transform.position);
-        direction.Normalize();
-
-        // 현재 회전 각도
-        float rotateAmount = Vector3.Cross(direction, transform.right).z;
-
-        // 회전
-        rb.angularVelocity = -rotateAmount * rotateSpeed;
-
-        // 앞으로 이동
-        rb.velocity = transform.right * speed;
+        // 방향으로 일자 이동
+        rb.velocity = moveDirection * speed;
     }
 
     private void OnTriggerEnter2D(Collider2D other)

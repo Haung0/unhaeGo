@@ -622,9 +622,9 @@ GameObject:
   - component: {fileID: 261913449}
   - component: {fileID: 261913448}
   - component: {fileID: 261913447}
-  - component: {fileID: 261913451}
   - component: {fileID: 261913450}
   - component: {fileID: 261913453}
+  - component: {fileID: 261913454}
   m_Layer: 6
   m_Name: Boss
   m_TagString: Enemy
@@ -688,12 +688,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: e9edcc163e6607941b40459039ff3ec2, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 015cc9e6c3749435f8a1905cadfa8fb3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.4, y: 0.47}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -708,8 +708,8 @@ Transform:
   m_GameObject: {fileID: 261913446}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.07, y: -1.3442712, z: 0}
-  m_LocalScale: {x: 0.26367185, y: 0.26367185, z: 3}
+  m_LocalPosition: {x: 4.28, y: -0.78, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 384431033}
@@ -742,7 +742,23 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 5
---- !u!61 &261913451
+--- !u!114 &261913453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 261913446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5eed497b60c4eb4e997f6bd5830db05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1882873155}
+  moveSpeed: 2
+  followRange: 5
+  maxHP: 1500
+--- !u!61 &261913454
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -774,35 +790,19 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.35617423, y: -4.2486973}
+  m_Offset: {x: 0.09886515, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 14.6285715, y: 14.6285715}
-    newSize: {x: 1, y: 1}
+    oldSize: {x: 2.5, y: 2.9375}
+    newSize: {x: 0.4, y: 0.47}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 7.7142234, y: 9.495123}
+  m_Size: {x: 1.7547119, y: 2.9375}
   m_EdgeRadius: 0
---- !u!114 &261913453
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 261913446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5eed497b60c4eb4e997f6bd5830db05, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 1882873155}
-  moveSpeed: 2
-  followRange: 5
-  maxHP: 100
 --- !u!1 &384431032
 GameObject:
   m_ObjectHideFlags: 0
@@ -1937,7 +1937,6 @@ GameObject:
   - component: {fileID: 1882873156}
   - component: {fileID: 1882873158}
   - component: {fileID: 1882873159}
-  - component: {fileID: 1882873160}
   - component: {fileID: 1882873162}
   m_Layer: 0
   m_Name: Player
@@ -2076,16 +2075,11 @@ MonoBehaviour:
   moveSpeed: 5
   jumpForce: 7
   runSpeed: 9
-  meleeDamage: 10
-  meleeRange: 7
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  attackPoint: {fileID: 611082088}
   bulletPrefab: {fileID: 3788025276769663731, guid: f6ebbe6752bd0476386d05d1aee3a9c1, type: 3}
   bulletSpawnPoint: {fileID: 1501203765}
   maxBullets: 6
   shootCooldown: 2
+  bulletDamage: 7
 --- !u!50 &1882873157
 Rigidbody2D:
   serializedVersion: 4
@@ -2149,22 +2143,6 @@ MonoBehaviour:
   HPbar: {fileID: 1755878327}
   MaxHp: 100
   CurHp: 100
---- !u!114 &1882873160
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1882873151}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b5b07eec3045694fa3f4dc6cf3e9a7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  normalSprite: {fileID: 21300000, guid: 0e5a39e99f841451ea202f086f8c456e, type: 3}
-  rideSprite: {fileID: 21300000, guid: 7da37e84137ad4a2c8c204284c5dc000, type: 3}
-  interactRange: 10
-  rideObject: {fileID: 0}
 --- !u!114 &1882873162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2177,9 +2155,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deeea2268a82dd44ab7e1cb67a5a78d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackCooldown: 0.1
   attackRange: 2
   damage: 10
+  attackCooldown: 0.1
   enemyLayer:
     serializedVersion: 2
     m_Bits: 64

@@ -18,7 +18,7 @@ public class EnemyRanged : MonoBehaviour
     void Start()
     {
         //CurHp = MaxHp;
-        player = GameObject.FindWithTag("Player").transform;
+        player = GameObject.FindWithTag("Player")?.transform;
         InvokeRepeating(nameof(Fire), 1f, fireRate);
     }
 
@@ -26,16 +26,23 @@ public class EnemyRanged : MonoBehaviour
     {
         if (player == null || isDead) return;
 
+        // 플레이어 방향 계산
         Vector2 dir = (player.position - transform.position).normalized;
 
+        // 총알 생성
         GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-        rb.velocity = dir * bulletSpeed;
 
-        bullet.GetComponent<Bullet>().damage = damage;
+        // Bullet 스크립트 가져와 설정
+        Bullet bulletScript = bullet.GetComponent<Bullet>();
+        if (bulletScript != null)
+        {
+            bulletScript.bulletType = Bullet.BulletType.Enemy; // 적용 총알임을 명시
+            bulletScript.damage = damage;
+            bulletScript.speed = bulletSpeed;
+            bulletScript.SetDirection(dir); // Bullet.cs에서 방향 지정
+        }
     }
 
-   
     public void TakeDamage(int amount)
     {
         if (isDead) return;
@@ -53,10 +60,7 @@ public class EnemyRanged : MonoBehaviour
         CurHp = 0;
         Debug.Log(gameObject.name + " 사망!");
 
-        // 필요하면 총알 발사 중지
-        CancelInvoke(nameof(Fire));
-
-        // 2초 후 제거
-        Destroy(gameObject, 2f);
+        CancelInvoke(nameof(Fire)); // 총알 발사 중단
+        Destroy(gameObject, 2f);    // 2초 후 삭제
     }
 }

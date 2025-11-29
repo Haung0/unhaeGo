@@ -6,18 +6,14 @@ public class MoveController : MonoBehaviour
     public float moveSpeed = 5f;
     public float jumpForce = 7f;
     public float runSpeed = 9f;
-
-    [Header("근접 공격 설정")]
-    public int meleeDamage = 10;
-    public float meleeRange = 1f;
-    public LayerMask enemyLayer;
-    public Transform attackPoint;
+   
 
     [Header("총알 공격 설정")]
     public GameObject bulletPrefab;
     public Transform bulletSpawnPoint;
     public int maxBullets = 6;
     public float shootCooldown = 2f;
+    public int bulletDamage = 7;
     private int bulletsLeft;
     private float nextShootTime = 0f;
 
@@ -58,12 +54,6 @@ public class MoveController : MonoBehaviour
         if (moveInput.x > 0) spriteRenderer.flipX = false;
         else if (moveInput.x < 0) spriteRenderer.flipX = true;
 
-        // 근접 공격 (좌클릭)
-        if (Input.GetMouseButtonDown(0))
-        {
-            MeleeAttack();
-        }
-
         // 총알 발사 (우클릭)
         if (Input.GetMouseButtonDown(1) && Time.time >= nextShootTime)
         {
@@ -85,54 +75,35 @@ public class MoveController : MonoBehaviour
         }
     }
 
-    // 근접 공격
-    void MeleeAttack()
-    {
-        //Anim.SetTrigger("isAttacking");
-
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, meleeRange, enemyLayer);
-        foreach (Collider2D enemy in hitEnemies)
-        {
-            BaseController bc = enemy.GetComponent<BaseController>();
-            if (bc != null)
-            {
-                bc.TakeDamage(meleeDamage);
-                Debug.Log("근접 공격! 데미지: " + meleeDamage);
-            }
-        }
-    }
-
     // 총알 발사
     void Shoot()
     {
         if (bulletsLeft <= 0)
         {
-            // 재장전
             nextShootTime = Time.time + shootCooldown;
             bulletsLeft = maxBullets;
             Debug.Log("재장전 완료!");
             return;
         }
 
-        Vector3 direction = spriteRenderer.flipX ? Vector3.left : Vector3.right;
-        GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
-        bullet.GetComponent<Rigidbody2D>().velocity = direction * 10f;
+        // 마우스 방향 계산
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 direction = (mousePos - bulletSpawnPoint.position);
+        direction.Normalize();
 
-        // 총알 데미지 전달
+        // 총알 생성
+        GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
+
+        // Bullet 스크립트에 방향 전달
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         if (bulletScript != null)
         {
-            bulletScript.damage = meleeDamage; // 총알 데미지 = 근접 데미지와 동일 (원하면 따로 값 줄 수 있음)
+            bulletScript.damage = bulletDamage;
+            bulletScript.SetDirection(direction);  // ← 여기서 방향 전달!
         }
 
         bulletsLeft--;
         nextShootTime = Time.time + 0.2f;
     }
 
-    void OnDrawGizmosSelected()
-    {
-        if (attackPoint == null) return;
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(attackPoint.position, meleeRange);
-    }
 }
